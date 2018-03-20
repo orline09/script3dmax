@@ -1,0 +1,31 @@
+rollout unnamedRollout "Untitled" width:160 height:172 --стандартная фигня, говорящая что будет юзерформа
+	
+(
+	button btn8 "generate" pos:[32,96] width:104 height:24 -- кнопка запустить все
+	button btn5 "Delete all" pos:[32,132] width:104 height:24 --кнопка удалить все
+	spinner spn2 "parametr X" pos:[24,16] width:128 height:16 range:[0,100,2] -- вводим первый параметр для x
+	spinner spn3 "parametr Y" pos:[24,40] width:128 height:16 range:[0,100,2.2] -- ввводим второй параметр для y
+	spinner spn4 "parametr Z" pos:[24,64] width:128 height:16 range:[0,100,1] -- вводим третий параметр для z
+	on btn8 pressed do -- жмякаем на кноку generate и начинается magic
+	(
+		r=#() -- объявляем массив состоящий из точек с какими-то координатами
+		for i = 1 to 300 do ( --при помощи цикла начинаем генерировать координаты точек
+			x = sin(i*3*spn2.value)*100
+			y=cos(i*3*spn3.value)*100
+			z=cos(i*3*spn4.value)*100  --сгенерировали координаты точки
+			Sphere radius:5 smooth:on segs:8 chop:0 slice:off sliceFrom:0 sliceTo:0 pos:[x,y,z] --построили по координатам сферу --smooth - гладкость сферы что рендере была нормальной
+				centr = [x,y,z] 		--chop - это чтоб сфера была целой, slice -непонятно вообще зачем писалось тут, так же как и slicefrom и sliceTO, они имеют стандартнаые значения																						
+			append r centr  --вводим точку в массив                                                               --вообщем у сферы слишком много лишних параметров прописано
+		)
+		aw=SplineShape name:("Spline") --объявляем что есть объект сплайн
+		addnewspline aw --добавляем его
+		for i = 1 to 300 do ( --при помощи цикла 
+			addKnot aw 1 #smooth #curve r[i])  --добавить точку к сплайну
+			try (updateshape aw) catch()  --обновить сплайн, чтобы он продолжился до новой точки
+	)
+	on btn5 pressed do ( --реализация удаления
+try (delete $Sp*)catch() 
+) 
+
+)
+createDialog unnamedRollout width:160 height:172 --закрытие юзерформы 
