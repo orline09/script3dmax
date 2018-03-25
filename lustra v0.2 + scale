@@ -1,0 +1,37 @@
+rollout unnamedRollout "Untitled" width:200 height:204 --стандартная фигня, говорящая что будет юзерформа
+	
+(
+	button btn8 "generate" pos:[64,149] width:104 height:24 -- кнопка запустить все
+	button btn5 "Delete all" pos:[64,174] width:104 height:24 --кнопка удалить все
+	spinner spn7 "Scale" pos:[24,88] width:128 height:16 range:[0,100000,100] -- масштаб
+	checkbox chk1 "Use Sphere;" pos:[8,112] width:80 --галочка для создания сферы
+	spinner spn5 "Radius:" pos:[112,112] width:86 height:16 range:[0,500,5] --выбираем радиус сферы
+	checkbox chk2 "Use Hedra" pos:[8,128] width:80 --галочка для создания хедры (не знаю какой, их много)
+	spinner spn6 "Radius:" pos:[112,128] width:86 height:16 range:[0,500,5]  -- выбираем радиус хедры
+	spinner spn2 "parametr X" pos:[24,16] width:128 height:16 range:[0,100,2] -- вводим первый параметр для x
+	spinner spn3 "parametr Y" pos:[24,40] width:128 height:16 range:[0,100,2.2] -- ввводим второй параметр для y
+	spinner spn4 "parametr Z" pos:[24,64] width:128 height:16 range:[0,100,1] -- вводим третий параметр для z
+	on btn8 pressed do -- жмякаем на кноку generate и начинается magic
+	(
+		r=#() -- объявляем массив состоящий из точек с какими-то координатами
+		for i = 1 to 1000 do ( --при помощи цикла начинаем генерировать координаты точек
+			x = sin(i*3*spn2.value)*spn7.value
+			y=cos(i*3*spn3.value)*spn7.value
+			z=cos(i*3*spn4.value)*spn7.value  --сгенерировали координаты точки
+			if (chk1.state==true) then (Sphere radius:spn5.value smooth:on segs:8 chop:0 slice:off sliceFrom:0 sliceTo:0 pos:[x,y,z]) --построили по координатам сферу --smooth - гладкость сферы что рендере была нормальной
+			if (chk2.state==true) then (Hedra radius:spn6.value family:4 pos:[x,y,z]) --тут должно быть наверное больше параметров, но я так и не понял какой быдет наикрасивейший
+				centr = [x,y,z] 																						
+			append r centr  --вводим точку в массив                                                             
+		)
+		aw=SplineShape name:("Spline") --объявляем что есть объект сплайн
+		addnewspline aw --добавляем его
+		for i = 1 to 1000 do ( --при помощи цикла 
+			addKnot aw 1 #smooth #curve r[i])  --добавить точку к сплайну
+			try (updateshape aw) catch()  --обновить сплайн, чтобы он продолжился до новой точки
+	)
+	on btn5 pressed do ( --реализация удаления
+try (delete $*)catch() 
+) 
+
+)
+createDialog unnamedRollout width:200 height:204 --закрытие юзерформы 
