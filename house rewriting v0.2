@@ -1,0 +1,85 @@
+rollout spl "Simple home v0.1" width:230 height:100 
+(
+	button generate1 "Generate home" pos:[64,40] width:104 height:24 --
+	spinner level "number of floors" pos:[64,16] width:128 height:16 range:[1,100,2] type:#integer 
+	button btn2 "Clear" pos:[64,68] width:104 height:24 /*   */
+	on generate1 pressed do
+	(
+		for ii=1 to level.value do( --create level 1... to many
+			h=ii-1 -- usefull
+			q=25 --maybe be usefull
+			firstbox = box pos:[0,0,0+q*h] scale:[1,1,1] name:("level-" + (ii as string)) --box of level
+			dopbox = box pos:[0,0,1+q*h] scale:[0.95,0.95,0.95] name:("fucking-trying, but delete in future// lol") 
+			convertToMesh dopbox
+		    convertToMesh firstbox;
+			firstbox - dopbox
+			delete dopbox --it's works
+			r1=12
+			r2=13.1
+			r3=0
+			r4=0
+			xx=0.05
+			yy=0.4 
+			z1=4.75
+			z2=0
+			f=0.1
+			ff=0.4 --nice math
+			for iii=1 to 4 do --collect the pieces of the floor
+				(
+					if iii==4 and ii==1 do exit
+				gll = box pos: [r1,r3,7+q*h] scale:[f,ff,0.4] color:blue name:((ii as string)+"ram_glass"+(iii as string)) -- create glass
+				convertToMesh gll
+				firstbox - gll
+				gl1 = box pos:[r2,r4,8.75+7+q*h] scale:[xx,yy,0.05] name:((ii as string)+"ram1") --
+					attachObjects gll gl1 move:false
+				gl2 = box pos:[r2,r4,7+q*h] scale:[xx,yy,0.05] name:((ii as string)+"ram2") --
+					attachObjects gll gl2 move:false
+				gl3 = box pos:[r2+z2,z1+r4,7+q*h] scale:[0.05,0.05,0.4] name:((ii as string)+"ram3") --
+					attachObjects gll gl3 move:false
+				gl4 = box pos:[r2-z2,-z1+r4,0+7+q*h] scale:[0.05,0.05,0.4] name:((ii as string)+"ram4") --
+					attachObjects gll gl4 move:false
+				gl5 = box pos:[r2,r4,7+q*h] scale:[0.05,0.05,0.4] name:((ii as string)+"ram5") --
+					attachObjects gll gl5 move:false
+				gl6 = box pos:[r2,r4,8.75/2+7+q*h] scale:[xx,yy,0.05] name:((ii as string)+"ram6") --x y x  myabe it's magic, but i'm weak at creating windows
+					attachObjects gll gl6 move:false
+				attachObjects firstbox gll move:false
+				if iii==1 do (
+					r1=-12
+					r2=-13.1
+					continue
+					)
+				if iii==2 then (
+					r1=0
+					r2=0
+					r3=-12
+					r4=-13.1
+					xx=0.4
+					yy=0.05
+					z1=0
+					z2=4.75
+					f=0.4
+					ff=0.1
+					continue
+				
+				)
+				if iii==3 then (
+					r3=12
+					r4=13.1
+				)
+				
+			)
+			if ii==1 do ( --creating door
+				b=box pos: [0,12,0] scale: [0.3,0.1,0.5] name:("1door")
+				convertToMesh b
+				firstbox - b
+				brt=box pos: [2,13,4.5] scale: [0.1,0.05,0.05] name:("1door_handle")
+				attachObjects b brt move:false
+				attachObjects firstbox b move:false
+				) 
+			) --this is end of one floor, nice
+	)
+on btn2 pressed do ( 
+try (delete $*)catch() 
+) 
+)
+CreateDialog spl
