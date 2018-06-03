@@ -1,0 +1,57 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <stdlib.h>
+#include <algorithm>
+#include <iterator>  
+using namespace std;
+vector<vector<string>> output_array(vector<string> begining_words)
+{
+	vector<vector<string>> out_group;
+	string a, b;
+	vector<string> c;
+	for (int i = 0; begining_words.empty() == false; i++)
+	{
+		c.push_back(begining_words.front());
+		a = begining_words.front();
+		sort(a.begin(), a.end());
+		begining_words.erase(begining_words.begin());
+		for (int j = 0; j < begining_words.size(); )
+		{
+			b = begining_words[j];
+			sort(b.begin(), b.end());
+			if (a == b)
+			{
+				c.push_back(begining_words[j]);
+				begining_words.erase(begining_words.begin()+j);
+			}
+			else
+			{
+				j++;
+			}
+		}
+		out_group.push_back(c);
+		c.clear();
+	}
+
+	return out_group;
+}
+int main(int argc)
+{
+	vector<string> begin_array;
+	vector<vector<string>> out;
+	begin_array.push_back("TOP");
+	begin_array.push_back("TOK");
+	begin_array.push_back("POT");
+	begin_array.push_back("KPOT");
+	begin_array.push_back("KOT");
+	out = output_array(begin_array);
+	for (int i = 0; i < out.size();i++)
+	{
+		for (int j = 0; j < out[i].size(); j++)
+			cout << out[i][j] << " ";
+		cout << endl;
+	}
+	int aa;
+	cin >> aa;
+}
