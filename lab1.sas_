@@ -1,3 +1,4 @@
+title '1 task';
 data lab1;  *import data from file.csv;
 	INFILE '/home/orline090/Lab1/movie_metadata.csv' DLM = ',' DSD;
 	length color $10 director_name $25 actor_2_name $25     
@@ -9,56 +10,89 @@ data lab1;  *import data from file.csv;
 	facenumber_in_poster plot_keywords  movie_imdb_link  num_user_for_reviews
 	language  country  content_rating budget title_year 
 	actor_2_facebook_likes imdb_score aspect_ratio movie_facebook_likes;
-	IF _N_ > 1 and _N_ < 50 THEN output;
+	IF _N_ > 1 THEN output;
  run;
-*proc print data = lab1;
-*run;
+proc print data = lab1 (obs = 25);
+run;
  
-data lab12; * задание 1.3 оставить только нужные столбцы;
-  set lab1;
+data lab12; * задание 1.2 оставить только нужные столбцы;
+  set lab1;                     
   keep director_name budget imdb_score title_year;
 run;
-
-*proc print data = lab12;
-*run;
-
+title '2 task';
+proc print data = lab12 (obs = 25);
+run;
+ * задание 1.3 сортировка по режисеру, году и бюджету, (можно использовать NODUPKEYS) чтоб не повторялись режиссеры)//;
 proc sort data = lab12 out = lab13; *задание 1.4 сортировка по строчкам (можно переделать для удобства чтения);
 by  director_name title_year budget;
 run;
-
-*proc print data=lab13;
-*run;
-
-proc freq data = lab13; 				*делаем подсчет количества фильмов на автора;
-table  director_name / out = lab14;;
+DATA lab13;
+ SET lab13;
+ IF _N_ > 104 THEN output;
+RUN;
+title '3 task';
+proc print data=lab13 (obs = 25);
 run;
+*задание 1.4 простейший частотный анализ; 
+proc freq data = lab13 noprint; 				* can add noprint/ делаем подсчет количества фильмов на автора;
+table  director_name / out = lab14;
+run;
+
 proc sort data = lab14;
 by descending count;
 run;
-proc print data = lab14;
+title '4 task';
+proc print data = lab14 (obs = 25);
 run;
 
-PROC MEANS data = lab14 MIN Q1 MEDIAN Q3 MAX;  							*расчет квартилей;
- *VAR DT ;
- OUTPUT out = lab15 MIN = Q0 Q1 = Q1 MEDIAN = Q2 Q3 = Q3 MAX = Q4;
+*задание 1.5 вычислить квартили для авторов фильмов;
+title '5 task';
+PROC MEANS data = lab14 MIN Q1 MEDIAN Q3 MAX;  							*расчет квартилей и не только;
+ OUTPUT out = lab15  MIN = Q0 Q1 = Q1 MEDIAN = Q2 Q3 = Q3 MAX = Q4;
 RUN;
 
 *задание 1.6 оставить только фильмы авторов, попавших в 1 и 3 квартили/;
-data gg;
-	set lab1;
-	keep director_name movie_title;
-run;
-data g;
-	set gg lab14;
-	
+proc sql;
+	create table lab16 as
+	select movie_title, title_year  from lab1 where director_name in (select director_name from lab13 where director_name in (select director_name from lab14 where count in ((select Q3 from lab15) union (select Q1 from lab15))));
+quit;
+title '6 task';
+proc print data = lab16 (obs = 25);
 run;
 
-
-proc print data = g;
+*задание 1.7 простейший частотный анализ фильмов по годам;
+proc freq data=lab16 noprint;
+	table title_year / out = lab17;
 run;
-/*data lab16;
-	set lab13;
-	where 
-  */
-*proc contents data=lab1 varnum;
-*run;
+proc sort data = lab17;
+by descending count;
+run;
+title '7 task';
+proc print data = lab17 (obs = 25);
+run;
+
+*задание 1.8 сделать нормализацию;
+proc stdize data=lab13 out=lab18 method=RANGE;
+   var budget imdb_score;
+run;
+title '8 task';
+proc print data=lab18 (obs=25);
+run; 
+
+* задание 1.9 построить гистограмы и кривые распределения;
+title '9 task';
+PROC UNIVARIATE data=lab13 noprint;
+ var budget imdb_score;
+ histogram budget/ ENDPOINTS VSCALE=COUNT VAXISLABEL='Количество наблюдений' 
+ NORMAL (NOPRINT COLOR=red) kernel;
+  HISTOGRAM imdb_score/ ENDPOINTS VSCALE=COUNT VAXISLABEL='Количество наблюдений' 
+  NORMAL (NOPRINT COLOR=red) kernel;
+RUN;
+
+*задание 1.10 построитиь график линейной регрессии;
+title '10 task';
+ODS GRAPHICS ON;
+PROC REG DATA=lab13;
+MODEL budget=imdb_score;
+RUN ;
+ODS GRAPHICS OFF;
