@@ -1,0 +1,22 @@
+-- от 18 до 25 включительно
+select sum(it.price)/count(distinct us.userId) from users as us
+	left join purchases as pu on
+		us.userId = pu.userId
+	left join items as it on
+		pu.itemId=it.itemId
+	where us.age<=25 and us.age>=18
+union 
+-- от 26 до 35 включительно
+select sum(it.price)/count(distinct us.userId) from users as us
+	left join purchases as pu on
+		us.userId = pu.userId
+	left join items as it on
+		pu.itemId=it.itemId
+	where us.age<=35 and us.age>=26
+union 
+-- для любого пользователя
+select sum(it.price)/count(distinct us.userId) from users as us
+	left join purchases as pu on
+		us.userId = pu.userId
+	left join items as it on
+		pu.itemId=it.itemId
